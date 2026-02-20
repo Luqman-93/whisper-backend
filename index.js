@@ -13,11 +13,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins for dev
+    origin: "*", // Allow all origins for dev / API consumption
     methods: ["GET", "POST"]
   }
 });
 
+// Use the PORT from Railway or default 5000
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -33,7 +34,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Make io accessible to our routers
+// Make io accessible to routers
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -65,7 +66,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/content', contentRoutes);
 
-
 // Basic Route
 app.get('/', (req, res) => {
   res.send('Whisper API is running...');
@@ -76,14 +76,17 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
-    // Sync models (normal sync - use migration script for schema changes)
+    
+    // Sync models (normal sync - use migration scripts for production schema changes)
     await sequelize.sync();
 
+    // Listen on all network interfaces (0.0.0.0) for Railway container
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(`Server accessible at http://192.168.100.14:${PORT}`);
+      console.log(`Server accessible at: ${process.env.APP_URL}`);
       console.log(`Local access: http://localhost:${PORT}`);
     });
+
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
