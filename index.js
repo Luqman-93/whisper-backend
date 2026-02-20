@@ -2,45 +2,45 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
-const { sequelize } = require('./models');
-
-dotenv.config();
-
 const http = require('http');
 const { Server } = require("socket.io");
 
+dotenv.config();
+
 const app = express();
 const server = http.createServer(app);
+
+// Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins for dev / API consumption
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
 
-// Use the PORT from Railway or default 5000
+// Port
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/uploads', express.static('uploads')); // serve uploads
 
-// Request Logging Middleware
+// Request logging
 app.use((req, res, next) => {
   const time = new Date().toLocaleTimeString();
   console.log(`[${time}] ${req.method} ${req.url}`);
   next();
 });
 
-// Make io accessible to routers
+// Make io accessible to routes
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// Socket.io Connection
+// Socket.io connection
 io.on('connection', (socket) => {
   const time = new Date().toLocaleTimeString();
   console.log(`[${time}] New client connected: ${socket.id}`);
@@ -66,29 +66,49 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/content', contentRoutes);
 
-// Basic Route
+// Root route
 app.get('/', (req, res) => {
   res.send('Whisper API is running...');
 });
 
-// Database Connection and Server Start
+// Sequelize setup
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql',
+    logging: console.log,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false, // required for Railway
+      },
+    },
+  }
+);
+
+// Start server
 const startServer = async () => {
   try {
+    console.log("Connecting to database...");
     await sequelize.authenticate();
-    console.log('Database connected successfully.');
-    
-    // Sync models (normal sync - use migration scripts for production schema changes)
-    await sequelize.sync();
+    console.log("Database connected successfully.");
 
-    // Listen on all network interfaces (0.0.0.0) for Railway container
-    server.listen(PORT, '0.0.0.0', () => {
+    // Sync models
+    await sequelize.sync();
+    console.log("Models synced.");
+
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Server accessible at: ${process.env.APP_URL}`);
       console.log(`Local access: http://localhost:${PORT}`);
     });
 
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error("Unable to connect to the database:", error);
   }
 };
 
