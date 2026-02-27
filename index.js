@@ -81,7 +81,7 @@ app.use('/api/content', contentRoutes);
 
 // Root route (VERY IMPORTANT for Railway testing)
 app.get('/', (req, res) => {
-  res.status(200).send('Whisper API is running...');
+  res.status(200).send('Whisper backend server running');
 });
 
 // ======================
@@ -124,6 +124,7 @@ async function startServer() {
 
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ HTTP server listening on 0.0.0.0:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 
     (async () => {
       // Step 2: DB authenticate
