@@ -1,0 +1,20 @@
+node_modules/
+
+# dotenv
+.env
+.env.*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# uploads (if you don't want user files tracked)
+uploads/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
