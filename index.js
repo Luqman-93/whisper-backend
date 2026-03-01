@@ -1,43 +1,53 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const dotenv = require('dotenv');
-const http = require('http');
-const { Server } = require('socket.io');
+// ======================
+// Core Imports
+// ======================
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const dotenv = require("dotenv");
+const http = require("http");
+const { Server } = require("socket.io");
 
-// Load environment variables
+// ======================
+// Load Environment Variables
+// ======================
 dotenv.config();
 
-// Centralized DB models (Sequelize) — use the same instance routes use
-const { sequelize } = require('./models');
+// ======================
+// Database + Seeder
+// ======================
+const { sequelize } = require("./models");
+const { seedAdmin } = require("./scripts/seedAdmin");
 
-// Admin seeder (runs on startup; non-fatal)
-const { seedAdmin } = require('./scripts/seedAdmin');
-
-// Global process-level error logging (prevent silent crashes)
-process.on('unhandledRejection', (reason) => {
-  console.error('[unhandledRejection]', reason);
+// ======================
+// Global Process Error Logging
+// ======================
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
 });
 
-process.on('uncaughtException', (err) => {
-  console.error('[uncaughtException]', err);
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
 });
 
+// ======================
+// App + Server Setup
+// ======================
 const app = express();
 const server = http.createServer(app);
 
 // ======================
-// PORT (Railway Required)
+// Railway Required PORT
 // ======================
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // ======================
 // Socket.io Setup
 // ======================
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
+    origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
@@ -47,16 +57,15 @@ const io = new Server(server, {
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 // Request logging
 app.use((req, res, next) => {
-  const time = new Date().toISOString();
-  console.log(`[${time}] ${req.method} ${req.url}`);
+  console.log(`${req.method} ${req.url}`);
   next();
 });
 
-// Make io accessible to routes
+// Make io accessible in routes
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -65,99 +74,65 @@ app.use((req, res, next) => {
 // ======================
 // Routes
 // ======================
-const authRoutes = require('./routes/authRoutes');
-const questionRoutes = require('./routes/questionRoutes');
-const expertRoutes = require('./routes/expertRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const userRoutes = require('./routes/userRoutes');
-const contentRoutes = require('./routes/contentRoutes');
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/question", require("./routes/questionRoutes"));
+app.use("/api/expert", require("./routes/expertRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/content", require("./routes/contentRoutes"));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/question', questionRoutes);
-app.use('/api/expert', expertRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/content', contentRoutes);
-
-// Root route (VERY IMPORTANT for Railway testing)
-app.get('/', (req, res) => {
-  res.status(200).send('Whisper backend server running');
+// ======================
+// Root Route (Railway Health Check)
+// ======================
+app.get("/", (req, res) => {
+  res.status(200).send("Whisper backend server running");
 });
 
 // ======================
-// Global error-handling middleware
+// Global Error Handler
 // ======================
-// This must be after all routes to catch route errors.
 app.use((err, req, res, next) => {
-  console.error('[Global Error Handler]', err);
-  if (res.headersSent) {
-    return;
+  console.error("[Global Error Handler]", err);
+  if (!res.headersSent) {
+    res.status(500).json({ message: "Internal server error" });
   }
-  res.status(500).json({ message: 'Internal server error' });
 });
 
 // ======================
 // Socket Connection
 // ======================
-io.on('connection', (socket) => {
-  console.log(`New client connected: ${socket.id}`);
+io.on("connection", (socket) => {
+  console.log("New client connected:", socket.id);
 
-  socket.on('disconnect', () => {
-    console.log(`Client disconnected: ${socket.id}`);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
   });
 });
 
 // ======================
-// Centralized Startup (Railway Safe)
-// Flow:
-// 1. Start HTTP server (keeps container alive)
-// 2. Connect database
-// 3. Sync models
-// 4. Run admin seed (non-fatal)
+// Start Server FIRST (Critical for Railway)
 // ======================
-async function startServer() {
-  console.log('🚀 Starting Whisper backend server...');
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 
-  server.on('error', (err) => {
-    console.error('[HTTP server error]', err);
+  // Run heavy startup tasks in background
+  setImmediate(async () => {
+    try {
+      console.log("⏳ Connecting to database...");
+      await sequelize.authenticate();
+      console.log("✅ Database connected.");
+
+      console.log("⏳ Syncing models...");
+      await sequelize.sync();
+      console.log("✅ Models synced.");
+
+      console.log("⏳ Seeding admin...");
+      const result = await seedAdmin();
+      console.log("✅ Admin seed result:", result);
+
+      console.log("✅ Startup background tasks completed.");
+    } catch (error) {
+      console.error("❌ Startup background error:", error);
+    }
   });
-
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ HTTP server listening on 0.0.0.0:${PORT}`);
-    console.log(`Server running on port ${PORT}`);
-
-    (async () => {
-      // Step 2: DB authenticate
-      try {
-        console.log('⏳ Connecting to database...');
-        await sequelize.authenticate();
-        console.log('✅ Database connection established.');
-      } catch (err) {
-        console.error('❌ Database connection failed (server will stay running):', err);
-      }
-
-      // Step 3: Sync models
-      try {
-        console.log('⏳ Syncing database models...');
-        await sequelize.sync();
-        console.log('✅ Database models synced.');
-      } catch (err) {
-        console.error('❌ Model sync failed (server will stay running):', err);
-      }
-
-      // Step 4: Admin seed (non-fatal)
-      try {
-        console.log('⏳ Running admin seed...');
-        const result = await seedAdmin();
-        console.log('✅ Admin seed result:', result);
-      } catch (err) {
-        console.error('❌ Admin seed failed (server will stay running):', err);
-      }
-
-      console.log('✅ Startup sequence completed.');
-    })();
-  });
-}
-
-// Kick off startup
-startServer();
+});
