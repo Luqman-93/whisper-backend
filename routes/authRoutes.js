@@ -305,6 +305,9 @@ router.post('/expert/login', async (req, res) => {
 router.post('/admin/login', async (req, res) => {
     try {
         const { email, password, adminPass } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password required' });
+        }
         const admin = await Admin.findOne({ where: { email } });
 
         if (!admin) return res.status(401).json({ message: 'Invalid credentials' });
@@ -312,13 +315,32 @@ router.post('/admin/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-        // Verify Static Admin Pass
-        if (admin.adminPass !== adminPass) {
-            return res.status(401).json({ message: 'Invalid Security Pass' });
+        // Optional "security pass" (2nd credential) check:
+        // Prefer validating against env (Railway) so changing ADMIN_SECURITY_CODE
+        // doesn't require reseeding the DB. Fall back to DB-stored admin.adminPass.
+        const expectedAdminPassRaw =
+            process.env.ADMIN_SECURITY_CODE ||
+            process.env.ADMIN_SECURITY_PASS ||
+            process.env.ADMIN_PASS ||
+            admin.adminPass;
+
+        if (expectedAdminPassRaw) {
+            const expected = String(expectedAdminPassRaw).trim();
+            const provided = adminPass == null ? '' : String(adminPass).trim();
+            if (!provided || expected !== provided) {
+                return res.status(401).json({ message: 'Invalid Security Pass' });
+            }
         }
 
-        const token = generateToken({ id: admin.id, role: 'admin' });
-        res.json({ token, role: 'admin' });
+        const token = generateToken({ id: admin.id, role: 'admin', email: admin.email });
+        res.json({
+            token,
+            role: 'admin',
+            admin: {
+                id: admin.id,
+                email: admin.email
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

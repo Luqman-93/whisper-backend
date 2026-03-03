@@ -81,6 +81,14 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/content", require("./routes/contentRoutes"));
 
+// Backwards-compatible (non-/api) route aliases for clients
+app.use("/auth", require("./routes/authRoutes"));
+app.use("/question", require("./routes/questionRoutes"));
+app.use("/expert", require("./routes/expertRoutes"));
+app.use("/admin", require("./routes/adminRoutes"));
+app.use("/user", require("./routes/userRoutes"));
+app.use("/content", require("./routes/contentRoutes"));
+
 // ======================
 // Root Route (Railway Health Check)
 // ======================
