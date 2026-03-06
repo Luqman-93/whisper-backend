@@ -7,6 +7,9 @@ const helmet = require("helmet");
 const dotenv = require("dotenv");
 const http = require("http");
 const { Server } = require("socket.io");
+const dns = require("dns");
+
+dns.setDefaultResultOrder("ipv4first");
 
 // ======================
 // Load Environment Variables
