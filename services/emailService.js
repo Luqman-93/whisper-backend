@@ -1,20 +1,104 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const dns = require('dns');
 
 dotenv.config();
 
-// Create reusable transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // true for 465, false for other ports
-    family: 4,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+// Enforce IPv4 DNS resolution for better compatibility on hosts like Railway
+dns.setDefaultResultOrder('ipv4first');
+
+// Normalize and validate email-related environment variables
+const getEmailEnvConfig = () => {
+    const user = process.env.EMAIL_USER || process.env.SMTP_USER;
+    const pass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.SMTP_PORT) || 587;
+
+    if (!user || !pass) {
+        console.error('❌ Email configuration error: EMAIL_USER/EMAIL_PASS (or SMTP_USER/SMTP_PASS) are not set.');
+        return null;
     }
-});
+
+    return { user, pass, host, port };
+};
+
+// Lazily created Nodemailer transporter using Gmail SMTP (or configured host)
+let transporter = null;
+
+const getTransporter = () => {
+    if (transporter) {
+        return transporter;
+    }
+
+    const cfg = getEmailEnvConfig();
+    if (!cfg) {
+        return null;
+    }
+
+    const { user, pass, host, port } = cfg;
+
+    try {
+        transporter = nodemailer.createTransport({
+            host: host || 'smtp.gmail.com',
+            port: port || 587,
+            secure: false,
+            family: 4,
+            connectionTimeout: 20000,
+            greetingTimeout: 20000,
+            socketTimeout: 20000,
+            auth: {
+                user,
+                pass
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+
+        console.log('✅ Email transporter initialized with host:', host, 'port:', port);
+        return transporter;
+    } catch (error) {
+        console.error('❌ Failed to create email transporter');
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        return null;
+    }
+};
+
+// Central helper to send emails with consistent logging and error handling
+const sendEmail = async (mailOptions, context = 'generic') => {
+    const tx = getTransporter();
+    if (!tx) {
+        console.error(`❌ [${context}] Email sending skipped because transporter is not configured.`);
+        return { success: false, error: 'Email transporter not configured' };
+    }
+
+    console.log(`📧 [${context}] Attempting to send email to:`, mailOptions.to);
+
+    try {
+        const info = await tx.sendMail(mailOptions);
+        if (info && info.response) {
+            console.log(`✅ [${context}] Email sent successfully to ${mailOptions.to}`);
+            console.log(`SMTP Response: ${info.response}`);
+        } else {
+            console.log(`✅ [${context}] Email sent successfully to ${mailOptions.to}`);
+        }
+        return { success: true, messageId: info && info.messageId, response: info && info.response };
+    } catch (error) {
+        console.error(`❌ [${context}] Email sending failed`);
+        console.error('Error message:', error.message);
+        console.error('Error code:', error.code);
+        if (error.response) {
+            console.error('SMTP Response:', error.response);
+        }
+        if (error.command) {
+            console.error('SMTP Command:', error.command);
+        }
+        console.error('Error stack:', error.stack);
+        return { success: false, error: error.message, code: error.code };
+    }
+};
 
 // Generate verification token
 const generateVerificationToken = () => {
@@ -75,14 +159,7 @@ const sendVerificationEmail = async (email, name, token, userType = 'user') => {
         `
     };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Verification email sent:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('❌ Error sending email:', error);
-        return { success: false, error: error.message };
-    }
+    return sendEmail(mailOptions, 'verification-email');
 };
 
 // Send OTP verification email
@@ -134,14 +211,10 @@ const sendOTPEmail = async (email, name, otpCode) => {
         `
     };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ OTP email sent:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('❌ Error sending OTP email:', error);
-        return { success: false, error: error.message };
-    }
+    // Log OTP generation and target email for debugging (OTP value is already logged in controllers)
+    console.log('🔐 [otp-email] Preparing OTP email for:', email);
+
+    return sendEmail(mailOptions, 'otp-email');
 };
 
 
@@ -184,12 +257,7 @@ const sendPasswordChangeEmail = async (email, name) => {
         `
     };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('✅ Password change email sent');
-    } catch (error) {
-        console.error('❌ Error sending password change email:', error);
-    }
+    return sendEmail(mailOptions, 'password-change-email');
 };
 
 // Send expert approval email
@@ -226,12 +294,7 @@ const sendExpertApprovalEmail = async (email, name) => {
         `
     };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('✅ Expert approval email sent');
-    } catch (error) {
-        console.error('❌ Error sending approval email:', error);
-    }
+    return sendEmail(mailOptions, 'expert-approval-email');
 };
 
 module.exports = {

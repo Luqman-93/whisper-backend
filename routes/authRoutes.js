@@ -114,13 +114,21 @@ router.post('/user/register', async (req, res) => {
             verificationToken: generateVerificationToken(),
             verificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
         });
+        console.log('🔐 OTP generated for user registration:', { email, otpCode, otpExpiry });
 
         // Send OTP email
-        if (process.env.SMTP_USER) {
-            await sendOTPEmail(email, name || 'User', otpCode);
-            console.log('✅ OTP sent to:', email, '- Code:', otpCode); // Log for testing
+        if (process.env.EMAIL_USER || process.env.SMTP_USER) {
+            const emailResult = await sendOTPEmail(email, name || 'User', otpCode);
+            if (!emailResult || !emailResult.success) {
+                console.error('❌ Failed to send registration OTP email for:', email);
+                console.error('Email error:', emailResult && emailResult.error);
+                return res.status(500).json({
+                    message: 'Failed to send verification email. Please try again later.'
+                });
+            }
+            console.log('✅ OTP email dispatched to:', email);
         } else {
-            console.log('⚠️ SMTP not configured. OTP Code:', otpCode);
+            console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). OTP Code:', otpCode);
         }
 
         res.status(201).json({
@@ -223,12 +231,21 @@ router.post('/user/resend-otp', async (req, res) => {
         user.otpExpiry = otpExpiry;
         await user.save();
 
+        console.log('🔐 New OTP generated for user resend:', { email, otpCode, otpExpiry });
+
         // Send new OTP email
-        if (process.env.SMTP_USER) {
-            await sendOTPEmail(email, user.name || 'User', otpCode);
-            console.log('✅ New OTP sent to:', email, '- Code:', otpCode);
+        if (process.env.EMAIL_USER || process.env.SMTP_USER) {
+            const emailResult = await sendOTPEmail(email, user.name || 'User', otpCode);
+            if (!emailResult || !emailResult.success) {
+                console.error('❌ Failed to resend OTP email for:', email);
+                console.error('Email error:', emailResult && emailResult.error);
+                return res.status(500).json({
+                    message: 'Failed to resend verification email. Please try again later.'
+                });
+            }
+            console.log('✅ New OTP email dispatched to:', email);
         } else {
-            console.log('⚠️ SMTP not configured. OTP Code:', otpCode);
+            console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). OTP Code:', otpCode);
         }
 
         res.json({ message: 'New OTP code sent to your email' });
@@ -425,12 +442,21 @@ router.post('/expert/register', (req, res, next) => {
             otpExpiry
         });
 
+        console.log('🔐 OTP generated for expert registration:', { email, otpCode, otpExpiry });
+
         // Send OTP verification email
-        if (process.env.SMTP_USER) {
-            await sendOTPEmail(email, name, otpCode);
-            console.log('✅ Expert OTP sent to:', email, '- Code:', otpCode);
+        if (process.env.EMAIL_USER || process.env.SMTP_USER) {
+            const emailResult = await sendOTPEmail(email, name, otpCode);
+            if (!emailResult || !emailResult.success) {
+                console.error('❌ Failed to send expert registration OTP email for:', email);
+                console.error('Email error:', emailResult && emailResult.error);
+                return res.status(500).json({
+                    message: 'Failed to send verification email. Please try again later.'
+                });
+            }
+            console.log('✅ Expert OTP email dispatched to:', email);
         } else {
-            console.log('⚠️ SMTP not configured. Expert OTP Code:', otpCode);
+            console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). Expert OTP Code:', otpCode);
         }
 
         res.status(201).json({
@@ -526,11 +552,20 @@ router.post('/expert/resend-otp', async (req, res) => {
         expert.otpExpiry = otpExpiry;
         await expert.save();
 
-        if (process.env.SMTP_USER) {
-            await sendOTPEmail(email, expert.name, otpCode);
-            console.log('✅ New Expert OTP sent to:', email, '- Code:', otpCode);
+        console.log('🔐 New OTP generated for expert resend:', { email, otpCode, otpExpiry });
+
+        if (process.env.EMAIL_USER || process.env.SMTP_USER) {
+            const emailResult = await sendOTPEmail(email, expert.name, otpCode);
+            if (!emailResult || !emailResult.success) {
+                console.error('❌ Failed to resend expert OTP email for:', email);
+                console.error('Email error:', emailResult && emailResult.error);
+                return res.status(500).json({
+                    message: 'Failed to resend verification email. Please try again later.'
+                });
+            }
+            console.log('✅ New Expert OTP email dispatched to:', email);
         } else {
-            console.log('⚠️ SMTP not configured. Expert OTP Code:', otpCode);
+            console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). Expert OTP Code:', otpCode);
         }
 
         res.json({ message: 'New OTP code sent to your email' });
@@ -711,12 +746,20 @@ router.post('/forgot-password', async (req, res) => {
         account.otpExpiry = otpExpiry;
         await account.save();
 
+        console.log('🔐 OTP generated for password reset:', { email, otpCode, otpExpiry, userType });
+
         // Send Email
-        if (process.env.SMTP_USER) {
-            await sendOTPEmail(email, account.name, otpCode);
-            console.log(`✅ Forgot Password OTP sent to ${email} (${userType}): ${otpCode}`);
+        if (process.env.EMAIL_USER || process.env.SMTP_USER) {
+            const emailResult = await sendOTPEmail(email, account.name, otpCode);
+            if (!emailResult || !emailResult.success) {
+                console.error(`❌ Failed to send password reset OTP email for ${email} (${userType})`);
+                console.error('Email error:', emailResult && emailResult.error);
+                // For security, still return generic success message
+                return res.json({ message: 'If an account exists with this email, a reset code has been sent.' });
+            }
+            console.log(`✅ Forgot Password OTP email dispatched to ${email} (${userType})`);
         } else {
-            console.log(`⚠️ SMTP not configured. OTP for ${email}: ${otpCode}`);
+            console.log(`⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). OTP for ${email}: ${otpCode}`);
         }
 
         res.json({ message: 'If an account exists with this email, a reset code has been sent.', userType });
