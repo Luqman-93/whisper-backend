@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const upload = require('../middleware/upload');
 const { User, Expert, Admin } = require('../models');
 const { generateVerificationToken, sendVerificationEmail, generateOTP, sendOTPEmail } = require('../services/emailService');
+const ALLOWED_EXPERT_CATEGORIES = ['General', 'Education', 'Career'];
 
 const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
@@ -387,11 +388,15 @@ router.post('/expert/register', (req, res, next) => {
 }, async (req, res) => {
     try {
         const { email, password, name, category, userId } = req.body;
+        const normalizedCategory = (category || '').trim();
         const credentialsPath = req.files['credentials'] ? req.files['credentials'][0].path : null;
         const paymentScreenshotPath = req.files['paymentScreenshot'] ? req.files['paymentScreenshot'][0].path : null;
 
         if (!email || !password || !name || !category) {
             return res.status(400).json({ message: 'All fields are required' });
+        }
+        if (!ALLOWED_EXPERT_CATEGORIES.includes(normalizedCategory)) {
+            return res.status(400).json({ message: 'Invalid expert category selected' });
         }
 
         if (!req.files['credentials']) {
@@ -410,7 +415,7 @@ router.post('/expert/register', (req, res, next) => {
 
                 existingExpert.name = name;
                 existingExpert.password = hashedPassword;
-                existingExpert.category = category;
+                existingExpert.category = normalizedCategory;
                 existingExpert.credentialsPath = credentialsPath;
                 existingExpert.paymentScreenshot = paymentScreenshotPath;
                 existingExpert.status = 'pending';
@@ -435,7 +440,7 @@ router.post('/expert/register', (req, res, next) => {
             email,
             password,
             name,
-            category,
+            category: normalizedCategory,
             userId,
             credentialsPath,
             paymentScreenshot: paymentScreenshotPath,

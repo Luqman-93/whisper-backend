@@ -21,6 +21,7 @@ dotenv.config();
 // ======================
 const { sequelize } = require("./models");
 const { seedAdmin } = require("./scripts/seedAdmin");
+const { migrateHealthCategory } = require("./scripts/migrateHealthCategory");
 
 // ======================
 // Global Process Error Logging
@@ -136,6 +137,9 @@ server.listen(PORT, "0.0.0.0", () => {
       console.log("⏳ Syncing models...");
       await sequelize.sync();
       console.log("✅ Models synced.");
+
+      console.log("⏳ Migrating category schema/data...");
+      await migrateHealthCategory(sequelize);
 
       console.log("⏳ Seeding admin...");
       const result = await seedAdmin();

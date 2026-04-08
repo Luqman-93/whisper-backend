@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         category: {
-            type: DataTypes.ENUM('General', 'Education', 'Career', 'Health'),
+            type: DataTypes.ENUM('General', 'Education', 'Career'),
             allowNull: false,
             defaultValue: 'General'
         },

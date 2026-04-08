@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Question, Response, SessionReport, User, Expert } = require('../models');
-const { Op } = require('sequelize');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const aiService = require('../services/aiService');
+const ALLOWED_CATEGORIES = ['General', 'Education', 'Career'];
 
 // Submit a new question
 router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
@@ -13,11 +13,11 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
         if (req.user.role !== 'user') return res.status(403).json({ message: 'Only users can post questions' });
 
         const { content, category } = req.body;
-        // Rename support: treat legacy "Health" as "Education"
-        const normalizedCategory = category === 'Health' ? 'Education' : category;
-        const categoriesForRouting = normalizedCategory === 'Education'
-            ? ['Education', 'Health']
-            : [normalizedCategory];
+        const normalizedCategory = (category || '').trim();
+
+        if (!ALLOWED_CATEGORIES.includes(normalizedCategory)) {
+            return res.status(400).json({ message: 'Invalid category selected' });
+        }
         // Normalize path for URL usage (replace backslashes with slashes)
         const attachment = req.file ? req.file.path.replace(/\\/g, '/') : null;
 
@@ -89,7 +89,7 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
 
         // STEP 1: Try to find ONLINE expert first (priority)
         let expert = await Expert.findOne({
-            where: { category: { [Op.in]: categoriesForRouting }, isVerified: true, isOnline: true },
+            where: { category: normalizedCategory, isVerified: true, isOnline: true },
             order: [['createdAt', 'DESC']]
         });
 
@@ -99,7 +99,7 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
             console.log(`[Routing] Looking for offline ${normalizedCategory} expert...`);
 
             expert = await Expert.findOne({
-                where: { category: { [Op.in]: categoriesForRouting }, isVerified: true },
+                where: { category: normalizedCategory, isVerified: true },
                 order: [['createdAt', 'DESC']]
             });
 
