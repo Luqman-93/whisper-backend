@@ -117,24 +117,29 @@ router.post('/user/register', async (req, res) => {
         console.log('🔐 OTP generated for user registration:', { email, otpCode, otpExpiry });
 
         // Send OTP email
+        let otpDispatched = true;
         if (process.env.EMAIL_USER || process.env.SMTP_USER) {
             const emailResult = await sendOTPEmail(email, name || 'User', otpCode);
             if (!emailResult || !emailResult.success) {
                 console.error('❌ Failed to send registration OTP email for:', email);
                 console.error('Email error:', emailResult && emailResult.error);
-                return res.status(500).json({
-                    message: 'Failed to send verification email. Please try again later.'
-                });
+                otpDispatched = false;
             }
-            console.log('✅ OTP email dispatched to:', email);
+            if (otpDispatched) {
+                console.log('✅ OTP email dispatched to:', email);
+            }
         } else {
             console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). OTP Code:', otpCode);
+            otpDispatched = false;
         }
 
         res.status(201).json({
-            message: 'Registration successful. Please check your email for verification code.',
+            message: otpDispatched
+                ? 'Account created successfully. Please verify your email.'
+                : 'Account created successfully. If you did not receive OTP, tap resend on verification screen.',
             email: email,
-            requiresVerification: true
+            requiresVerification: true,
+            otpDispatched
         });
     } catch (error) {
         console.error('❌ User Registration Error:', error.message);
@@ -445,25 +450,30 @@ router.post('/expert/register', (req, res, next) => {
         console.log('🔐 OTP generated for expert registration:', { email, otpCode, otpExpiry });
 
         // Send OTP verification email
+        let otpDispatched = true;
         if (process.env.EMAIL_USER || process.env.SMTP_USER) {
             const emailResult = await sendOTPEmail(email, name, otpCode);
             if (!emailResult || !emailResult.success) {
                 console.error('❌ Failed to send expert registration OTP email for:', email);
                 console.error('Email error:', emailResult && emailResult.error);
-                return res.status(500).json({
-                    message: 'Failed to send verification email. Please try again later.'
-                });
+                otpDispatched = false;
             }
-            console.log('✅ Expert OTP email dispatched to:', email);
+            if (otpDispatched) {
+                console.log('✅ Expert OTP email dispatched to:', email);
+            }
         } else {
             console.log('⚠️ Email credentials not configured (EMAIL_USER/SMTP_USER missing). Expert OTP Code:', otpCode);
+            otpDispatched = false;
         }
 
         res.status(201).json({
-            message: 'Registration successful. Please check your email for verification code.',
+            message: otpDispatched
+                ? 'Account created successfully. Please verify your email.'
+                : 'Account created successfully. If you did not receive OTP, tap resend on verification screen.',
             expertId: expert.id,
             email: email,
-            role: 'expert'
+            role: 'expert',
+            otpDispatched
         });
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {

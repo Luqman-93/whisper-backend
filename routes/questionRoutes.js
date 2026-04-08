@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Question, Response, SessionReport, User, Expert } = require('../models');
+const { Op } = require('sequelize');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const aiService = require('../services/aiService');
@@ -12,6 +13,11 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
         if (req.user.role !== 'user') return res.status(403).json({ message: 'Only users can post questions' });
 
         const { content, category } = req.body;
+        // Rename support: treat legacy "Health" as "Education"
+        const normalizedCategory = category === 'Health' ? 'Education' : category;
+        const categoriesForRouting = normalizedCategory === 'Education'
+            ? ['Education', 'Health']
+            : [normalizedCategory];
         // Normalize path for URL usage (replace backslashes with slashes)
         const attachment = req.file ? req.file.path.replace(/\\/g, '/') : null;
 
@@ -32,7 +38,7 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
             // Unsafe Content: Save as Flagged for Admin Review (FR-13)
             const flaggedQuestion = await Question.create({
                 content,
-                category: category,
+                category: normalizedCategory,
                 attachment,
                 userId: req.user.id,
                 expertId: null, // No expert assigned yet
@@ -79,28 +85,28 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
 
         // 3. Safe Content: Proceed with Expert Assignment
         // Use the category provided by the user (no AI categorization)
-        console.log(`[Routing] Looking for expert in category: ${category}`);
+        console.log(`[Routing] Looking for expert in category: ${normalizedCategory}`);
 
         // STEP 1: Try to find ONLINE expert first (priority)
         let expert = await Expert.findOne({
-            where: { category: category, isVerified: true, isOnline: true },
+            where: { category: { [Op.in]: categoriesForRouting }, isVerified: true, isOnline: true },
             order: [['createdAt', 'DESC']]
         });
 
         // STEP 2: If no ONLINE expert, assign to ANY expert in category (even offline)
         if (!expert) {
-            console.log(`[Routing] ⚠️ No ONLINE expert found for category: ${category}`);
-            console.log(`[Routing] Looking for offline ${category} expert...`);
+            console.log(`[Routing] ⚠️ No ONLINE expert found for category: ${normalizedCategory}`);
+            console.log(`[Routing] Looking for offline ${normalizedCategory} expert...`);
 
             expert = await Expert.findOne({
-                where: { category: category, isVerified: true },
+                where: { category: { [Op.in]: categoriesForRouting }, isVerified: true },
                 order: [['createdAt', 'DESC']]
             });
 
             if (expert) {
                 console.log(`[Routing] ✅ Assigned to OFFLINE expert: ${expert.name} (ID: ${expert.id}, Status: ${expert.isOnline ? 'Online' : 'Offline'})`);
             } else {
-                console.log(`[Routing] ❌ No expert found for category: ${category} (question will stay pending)`);
+                console.log(`[Routing] ❌ No expert found for category: ${normalizedCategory} (question will stay pending)`);
             }
         } else {
             console.log(`[Routing] ✅ Assigned to ONLINE expert: ${expert.name} (ID: ${expert.id})`);
@@ -109,7 +115,7 @@ router.post('/submit', auth, upload.single('attachment'), async (req, res) => {
         // 4. Create question with user-selected category
         const newQuestion = await Question.create({
             content,
-            category: category, // Use user-selected category directly
+            category: normalizedCategory, // Store new canonical value
             attachment,
             userId: req.user.id,
             expertId: expert ? expert.id : null,
