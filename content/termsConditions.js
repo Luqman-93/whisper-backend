@@ -1,227 +1,276 @@
 // Terms and Conditions Content
 module.exports = {
-    title: "Terms & Conditions",
-    lastUpdated: "February 9, 2026",
-    content: `
-# Terms and Conditions for Whisper App
-
-**Effective Date:** February 9, 2026
-
+  title: "Terms & Conditions",
+  lastUpdated: "June 6, 2026",
+  content: `
 ## 1. Acceptance of Terms
 
-By accessing or using Whisper ("the App"), you agree to be bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, you may not use the App.
+By downloading, installing, or using the Whisper mobile application ("App"), you agree to be bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, you must not use the App.
 
-## 2. Description of Service
-
-Whisper is an anonymous reporting and expert consultation platform that:
-- Allows anonymous users to submit questions and receive expert guidance
-- Connects verified experts with users seeking advice
-- Uses AI-powered content moderation to ensure platform safety
-- Provides real-time communication between users and experts
-
-## 3. User Categories
-
-### 3.1 Anonymous Users
-- Must be at least 18 years of age
-- Can submit questions anonymously
-- Identity is protected through cryptographic hashing
-- Agree not to abuse the anonymity for harmful purposes
-
-### 3.2 Expert Users
-- Must be at least 21 years of age
-- Must possess verifiable expertise in their chosen category
-- Must upload valid credentials for admin verification
-- Must maintain an active subscription (monthly or yearly)
-- Are responsible for the accuracy and quality of their responses
-
-### 3.3 Admin Users
-- Have elevated privileges for moderation and management
-- Must act in good faith to maintain platform integrity
-
-## 4. Expert Subscription and Payment
-
-### 4.1 Subscription Plans
-- **Monthly Plan:** Rs. 2,000 per month
-- **Yearly Plan:** Rs. 24,000 per year (15% discount from regular rate)
-
-### 4.2 Payment Terms
-- Payment must be completed before expert account activation
-- Payment screenshot must be uploaded during registration
-- Subscription is non-refundable once approved
-- Subscription auto-expires after the period ends unless renewed
-- Expert accounts become inactive upon subscription expiry
-
-### 4.3 Verification
-- Admin will review payment proof and credentials before approval
-- Approval is at the sole discretion of Whisper
-- False or fraudulent payment proof will result in permanent ban
-
-## 5. User Conduct
-
-### 5.1 Prohibited Activities
-You agree NOT to:
-- Post hate speech, harassment, or discriminatory content
-- Share violent, illegal, or harmful content
-- Impersonate others or provide false information
-- Spam or abuse the platform
-- Attempt to circumvent AI moderation systems
-- Share personal contact information to bypass the platform
-- Use the App for commercial solicitation without permission
-- Exploit vulnerabilities or attempt unauthorized access
-
-### 5.2 Content Moderation
-- All submissions are subject to AI content analysis
-- Inappropriate content will be flagged or rejected
-- Repeated violations will result in account suspension
-- Three (3) violations of hate speech policy result in permanent ban
-
-## 6. Expert Responsibilities
-
-Experts agree to:
-- Provide accurate, helpful, and professional guidance
-- Respond to assigned questions in a timely manner
-- Maintain confidentiality of user information
-- Not provide medical diagnoses or legal advice (unless qualified)
-- Disclose limitations of their expertise when appropriate
-- Use AI assistance ethically and review suggestions before sending
-- Create accurate session summaries
-
-## 7. Intellectual Property
-
-### 7.1 Platform Ownership
-- Whisper owns all rights to the App, including design, code, and branding
-- You may not copy, modify, or reverse-engineer the App
-
-### 7.2 User Content
-- You retain ownership of content you submit
-- You grant Whisper a license to use, display, and process your content for platform operations
-- You represent that you have the right to submit your content
-
-### 7.3 AI-Generated Content
-- AI-generated suggestions are provided "as-is"
-- Experts are responsible for reviewing and editing AI content before sending
-- Whisper is not liable for errors in AI-generated content
-
-## 8. Privacy and Data Protection
-
-- Your use of the App is governed by our Privacy Policy
-- Anonymous users' identities are protected through cryptographic hashing
-- We never sell your personal information to third parties
-- You can delete your account and data at any time
-
-## 9. Disclaimer of Warranties
-
-### 9.1 "AS IS" Service
-The App is provided "AS IS" and "AS AVAILABLE" without warranties of any kind, either express or implied, including but not limited to:
-- Fitness for a particular purpose
-- Accuracy or reliability of information
-- Uninterrupted or error-free operation
-
-### 9.2 Expert Advice
-- Advice provided by experts is for informational purposes only
-- It does not constitute professional medical, legal, or financial advice
-- You should seek professional in-person consultation for serious matters
-- Whisper does not endorse or guarantee expert responses
-
-## 10. Limitation of Liability
-
-To the maximum extent permitted by law:
-- Whisper is NOT liable for any indirect, incidental, or consequential damages
-- Our total liability shall not exceed the amount you paid for subscription (for experts) or Rs. 5,000 (for anonymous users)
-- We are not responsible for actions taken based on expert advice
-- We are not liable for third-party service failures (e.g., AI services)
-
-## 11. Account Termination
-
-### 11.1 By You
-You may delete your account at any time through the App settings.
-
-### 11.2 By Whisper
-We may suspend or terminate your account if you:
-- Violate these Terms
-- Engage in prohibited conduct
-- Accumulate 3 hate speech violations
-- Provide fraudulent information (experts)
-- Fail to renew subscription (experts)
-
-### 11.3 Effect of Termination
-- You lose access to the App
-- Your data may be deleted in accordance with our Privacy Policy
-- Outstanding subscription fees are non-refundable
-
-## 12. Indemnification
-
-You agree to indemnify and hold harmless Whisper from any claims, damages, or expenses arising from:
-- Your violation of these Terms
-- Your use of the App
-- Content you submit
-- Advice you provide (for experts)
-
-## 13. Dispute Resolution
-
-### 13.1 Governing Law
-These Terms are governed by the laws of [Your Jurisdiction].
-
-### 13.2 Arbitration
-Any disputes shall be resolved through binding arbitration rather than court litigation.
-
-### 13.3 Class Action Waiver
-You agree to resolve disputes on an individual basis and waive the right to participate in class actions.
-
-## 14. Content Flagging and Moderation
-
-### 14.1 AI Moderation
-- All content is analyzed by AI for hate speech, violence, and harassment
-- Flagged content is reviewed by admins
-- Users can appeal moderation decisions
-
-### 14.2 Three-Strike Policy
-- First violation: Warning
-- Second violation: Temporary suspension
-- Third violation: Permanent account deletion
-
-### 14.3 Immediate Bans
-The following result in immediate permanent ban:
-- Sharing child exploitation material
-- Threats of violence or terrorism
-- Doxxing or sharing private information
-- Fraudulent payment (for experts)
-
-## 15. Changes to Terms
-
-We may modify these Terms at any time. We will notify you by:
-- Updating the "Last Updated" date
-- Sending an in-app notification
-- Requiring acceptance for material changes
-
-Continued use after changes constitutes acceptance of new Terms.
-
-## 16. Severability
-
-If any provision of these Terms is found to be unenforceable, the remaining provisions shall remain in full effect.
-
-## 17. Entire Agreement
-
-These Terms, along with the Privacy Policy, constitute the entire agreement between you and Whisper.
-
-## 18. Contact Information
-
-For questions about these Terms, contact us at:
-
-**Email:** legal@whisperapp.com
-**Support:** support@whisperapp.com
-**Address:** [Your Business Address]
-
-## 19. Emergency Services Disclaimer
-
-> **IMPORTANT:** Whisper is NOT a substitute for emergency services. If you are experiencing a life-threatening emergency, call your local emergency number (112, 911, etc.) immediately.
-
-## 20. Acknowledgment
-
-By using Whisper, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
+These Terms form a legally binding agreement between you and Whisper ("we," "our," or "us"). Please read them carefully.
 
 ---
 
-**Last Updated:** February 9, 2026
-  `
+## 2. About Whisper
+
+Whisper is an anonymous expert consultation platform that:
+
+- Enables users to submit sensitive questions anonymously, without revealing their identity
+- Connects verified human experts with users seeking professional guidance
+- Uses AI-powered content moderation to ensure a safe and respectful environment
+- Provides real-time communication between users and experts
+
+Whisper is **not** a substitute for emergency services, medical treatment, legal representation, or licensed financial advice.
+
+---
+
+## 3. Eligibility
+
+### 3.1 Anonymous Users
+- Must be **18 years of age or older**
+- Must not be accessing the App for unlawful purposes
+- Must agree to use anonymity responsibly and ethically
+
+### 3.2 Expert Users
+- Must be **21 years of age or older**
+- Must hold verifiable qualifications or experience in their declared area of expertise
+- Must upload valid credentials for admin review and approval
+- Must maintain an active paid subscription to remain on the platform
+
+### 3.3 Admin Users
+- Must be designated by Whisper and act in good faith at all times
+- Are responsible for fair and consistent enforcement of these Terms
+
+---
+
+## 4. Expert Subscription & Payment
+
+### 4.1 Plans
+
+| Plan | Price |
+|------|-------|
+| Monthly | Rs. 2,000 / month |
+| Yearly | Rs. 24,000 / year *(save ~15%)* |
+
+### 4.2 Payment Terms
+
+- Full payment must be completed **before** expert account activation
+- A screenshot of payment proof must be uploaded at registration
+- Subscriptions are **non-refundable** once the account has been approved and activated
+- Accounts are automatically deactivated when the subscription period ends
+- Renewal must be initiated by the expert before expiry to avoid interruption
+
+### 4.3 Approval
+
+- Admin will review payment proof and submitted credentials before granting access
+- Approval is at the sole discretion of Whisper
+- Submission of false, forged, or fraudulent payment evidence will result in **permanent account termination** and may be reported to relevant authorities
+
+---
+
+## 5. Prohibited Conduct
+
+All users — anonymous, expert, and admin — are prohibited from:
+
+- Posting or submitting hate speech, harassment, threats, or discriminatory content
+- Sharing violent, sexually explicit, or illegal material
+- Impersonating any person, professional, or organization
+- Attempting to de-anonymize or identify other users
+- Sharing private contact details to bypass the platform
+- Spamming, flooding, or otherwise abusing platform features
+- Attempting to circumvent, manipulate, or exploit AI moderation systems
+- Reverse-engineering, decompiling, or copying any part of the App
+- Using the App for unauthorized commercial solicitation
+
+Violations will be handled under the three-strike policy outlined in Section 10.
+
+---
+
+## 6. Expert Responsibilities
+
+By registering as an expert, you agree to:
+
+- Provide accurate, professional, and timely responses to assigned questions
+- Clearly disclose any limitations or conflict of interest relevant to your answer
+- Maintain strict confidentiality regarding user questions and identities
+- Not offer definitive medical diagnoses, legal representation, or regulated financial advice unless appropriately licensed and disclaimers are provided
+- Review all AI-generated suggestions critically before sending — you are responsible for what you submit
+- Create honest and accurate session summaries upon closing a consultation
+
+Failure to meet these standards may result in account suspension or termination.
+
+---
+
+## 7. Content & AI Moderation
+
+### 7.1 Automated Screening
+
+All content submitted to Whisper is analyzed by AI before delivery. The AI flags content that falls into any of the following categories:
+
+- Self-harm or suicidal intent
+- Threats of violence toward others
+- Illegal activity (fraud, hacking, drug-related requests)
+- Harassment, severe insults, or targeted abuse
+- Explicit sexual content
+- Spam or phishing indicators
+
+### 7.2 Human Review
+
+Content flagged by AI is escalated to admin review. Admins may uphold or overturn AI decisions. You may appeal a moderation decision by contacting **support@whisperapp.com**.
+
+### 7.3 Three-Strike Policy
+
+| Strike | Consequence |
+|--------|-------------|
+| 1st Violation | Formal warning issued |
+| 2nd Violation | Temporary account suspension |
+| 3rd Violation | Permanent account deletion |
+
+### 7.4 Immediate & Permanent Bans
+
+The following conduct results in immediate permanent removal with no appeal:
+
+- Sharing or soliciting child exploitation material
+- Credible threats of terrorism or mass violence
+- Doxxing — revealing another user's private personal information
+- Submitting fraudulent payment proof (expert accounts)
+
+---
+
+## 8. Intellectual Property
+
+### 8.1 Platform Ownership
+
+Whisper retains all rights to the App's codebase, design, branding, trademarks, and features. You may not reproduce, modify, distribute, or create derivative works from any part of the App without prior written consent.
+
+### 8.2 User-Submitted Content
+
+You retain ownership of all content you submit. By submitting content, you grant Whisper a non-exclusive, royalty-free license to store, process, and display your content solely for the purpose of operating the platform.
+
+You represent that you have all rights necessary to submit the content and that doing so does not violate any third-party rights.
+
+### 8.3 AI-Generated Content
+
+AI-generated suggestions are provided as tools to assist experts. They are not reviewed or endorsed by Whisper prior to use. Experts bear full responsibility for any AI content they send to users.
+
+---
+
+## 9. Privacy
+
+Your use of Whisper is governed by our **Privacy Policy**, which is incorporated into these Terms by reference. By agreeing to these Terms, you also agree to the Privacy Policy.
+
+Key commitments:
+- Anonymous user identities are protected using cryptographic hashing
+- We never sell personal data to third parties
+- You may delete your account and data at any time
+
+---
+
+## 10. Disclaimer of Warranties
+
+The App is provided **"AS IS"** and **"AS AVAILABLE"** without any warranties, express or implied, including but not limited to:
+
+- Warranties of merchantability or fitness for a particular purpose
+- Guarantees of accuracy, completeness, or reliability of any content
+- Uninterrupted, error-free, or secure operation
+
+Expert responses are **informational only** and do not constitute licensed professional advice. For serious medical, legal, or financial concerns, please consult a licensed professional in person.
+
+---
+
+## 11. Limitation of Liability
+
+To the fullest extent permitted by applicable law:
+
+- Whisper shall not be liable for any indirect, incidental, consequential, or punitive damages
+- Our total aggregate liability to any user shall not exceed **Rs. 5,000** or the total subscription fees paid by that user in the prior 3 months, whichever is greater
+- We are not liable for actions taken by any user based on expert responses
+- We are not liable for failures or outages of third-party services (e.g., AI providers, email services, hosting)
+
+---
+
+## 12. Indemnification
+
+You agree to indemnify, defend, and hold harmless Whisper and its affiliates, officers, and employees from any claims, liabilities, damages, costs, or legal fees arising from:
+
+- Your breach of these Terms
+- Your use or misuse of the App
+- Content you submit to the platform
+- Advice or guidance you provide as an expert
+
+---
+
+## 13. Account Termination
+
+### 13.1 Termination by You
+
+You may delete your account at any time via App settings. Experts who terminate early are not entitled to a refund of unused subscription periods.
+
+### 13.2 Termination by Whisper
+
+We reserve the right to suspend or permanently terminate accounts that:
+
+- Violate these Terms (subject to the three-strike policy)
+- Engage in conduct that poses a risk to other users or the platform
+- Provide fraudulent credentials or payment information
+- Fail to renew an expired expert subscription
+
+### 13.3 Effect of Termination
+
+Upon termination, your access to the App is revoked immediately. Data may be retained for safety, legal compliance, or moderation purposes in accordance with our Privacy Policy.
+
+---
+
+## 14. Dispute Resolution
+
+### 14.1 Governing Law
+
+These Terms are governed by the laws of the Islamic Republic of Pakistan. Any disputes shall be subject to the exclusive jurisdiction of the courts located in Lahore, Punjab.
+
+### 14.2 Informal Resolution
+
+Before initiating any formal proceedings, you agree to attempt to resolve disputes informally by contacting us at **legal@whisperapp.com**. We will make reasonable efforts to resolve your concern within 30 days.
+
+### 14.3 Arbitration
+
+If informal resolution fails, disputes shall be submitted to binding arbitration in accordance with applicable arbitration rules. Each party shall bear its own costs unless otherwise awarded.
+
+---
+
+## 15. Changes to These Terms
+
+We may modify these Terms at any time. When we do:
+
+- The "Last Updated" date at the top of this document will be revised
+- Material changes will trigger an in-app notification requiring your acknowledgment
+- Continued use of the App after changes take effect constitutes acceptance of the revised Terms
+
+If you do not agree with the updated Terms, you must discontinue use and delete your account.
+
+---
+
+## 16. General Provisions
+
+- **Severability** — If any provision of these Terms is held unenforceable, the remaining provisions continue in full force and effect.
+- **Waiver** — Failure to enforce any provision does not constitute a waiver of future enforcement.
+- **Entire Agreement** — These Terms, together with the Privacy Policy, constitute the entire agreement between you and Whisper.
+- **Assignment** — You may not transfer your account or rights under these Terms to any third party.
+
+---
+
+## 17. Contact Information
+
+For questions or concerns regarding these Terms:
+
+**Legal Inquiries:** legal@whisperapp.com  
+**General Support:** support@whisperapp.com
+
+---
+
+> **Emergency Notice:** Whisper is not a crisis hotline or emergency service. If you or someone you know is in immediate danger, please contact your local emergency services immediately.
+
+---
+
+*Last Updated: June 6, 2026*
+`
 };
